@@ -498,7 +498,7 @@ public class Main extends Builder {
                 new Thread(() -> {
                     while (true) {
                         try {
-                            Mirror.mirrorNode(nodeToMirrorId, localApi, rawPointers, localStorage);
+                            Mirror.mirrorNode(nodeToMirrorId, localApi, rawPointers, transactions, localStorage);
                             try {
                                 Thread.sleep(60_000);
                             } catch (InterruptedException f) {}
@@ -516,7 +516,7 @@ public class Main extends Builder {
                 new Thread(() -> {
                     while (true) {
                         try {
-                            Mirror.mirrorUser(a.getArg("mirror.username"), localApi, rawPointers, localStorage);
+                            Mirror.mirrorUser(a.getArg("mirror.username"), localApi, rawPointers, transactions, localStorage);
                             try {
                                 Thread.sleep(60_000);
                             } catch (InterruptedException f) {}
@@ -639,7 +639,7 @@ public class Main extends Builder {
 
             UserContext user = UserContext.signIn(username, password, network, crypto).join();
 
-            Migrate.migrateToLocal(user, localStorage, rawPointers, rawSocial, userQuotas, crypto, network);
+            Migrate.migrateToLocal(user, transactions, localStorage, rawPointers, rawSocial, userQuotas, crypto, network);
             return true;
         } catch (Exception ex) {
             throw new RuntimeException(ex);
