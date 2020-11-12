@@ -498,7 +498,7 @@ public class Main extends Builder {
                 new Thread(() -> {
                     while (true) {
                         try {
-                            Mirror.mirrorNode(nodeToMirrorId, core, p2mMutable, localStorage, rawPointers, transactions, localStorage, hasher);
+                            Mirror.mirrorNode(nodeToMirrorId, core, p2mMutable, localStorage, rawPointers, transactions, hasher);
                             try {
                                 Thread.sleep(60_000);
                             } catch (InterruptedException f) {}
@@ -516,7 +516,7 @@ public class Main extends Builder {
                     while (true) {
                         try {
                             Mirror.mirrorUser(a.getArg("mirror.username"), core, p2mMutable, localStorage,
-                                    rawPointers, transactions, localStorage, hasher);
+                                    rawPointers, transactions, hasher);
                             try {
                                 Thread.sleep(60_000);
                             } catch (InterruptedException f) {}
