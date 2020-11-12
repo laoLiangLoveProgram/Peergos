@@ -240,11 +240,12 @@ public class Builder {
     }
 
     public static CoreNode buildCorenode(Args a,
-                                          DeletableContentAddressedStorage localStorage,
-                                          TransactionStore transactions,
-                                          JdbcIpnsAndSocial rawPointers,
-                                          MutablePointers localPointers,
-                                          MutablePointersProxy proxingMutable) {
+                                         DeletableContentAddressedStorage localStorage,
+                                         TransactionStore transactions,
+                                         JdbcIpnsAndSocial rawPointers,
+                                         MutablePointers localPointers,
+                                         MutablePointersProxy proxingMutable,
+                                         Hasher hasher) {
         Multihash nodeId = localStorage.id().join();
         PublicKeyHash peergosId = PublicKeyHash.fromString(a.getArg("peergos.identity.hash"));
         Multihash pkiServerId = getPkiServerId(a);
@@ -254,7 +255,7 @@ public class Builder {
                 buildPkiCorenode(new PinningMutablePointers(localPointers, localStorage), localStorage, a) :
                 new MirrorCoreNode(new HTTPCoreNode(buildP2pHttpProxy(a), pkiServerId), proxingMutable, localStorage,
                         rawPointers, transactions, peergosId,
-                        a.fromPeergosDir("pki-mirror-state-path","pki-state.cbor"));
+                        a.fromPeergosDir("pki-mirror-state-path","pki-state.cbor"), hasher);
     }
 
     public static JdbcIpnsAndSocial buildRawPointers(Args a) {
