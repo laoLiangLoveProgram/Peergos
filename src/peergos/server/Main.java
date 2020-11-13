@@ -428,8 +428,10 @@ public class Main extends Builder {
             MutablePointersProxy proxingMutable = new HttpMutablePointers(p2pHttpProxy, pkiServerNodeId);
 
             UsageStore usageStore = new JdbcUsageStore(getDBConnector(a, "space-usage-sql-file"), sqlCommands);
+            JdbcIpnsAndSocial rawSocial = new JdbcIpnsAndSocial(getDBConnector(a, "social-sql-file"), sqlCommands);
 
-            CoreNode core = buildCorenode(a, localStorage, transactions, rawPointers, localPointers, proxingMutable, crypto.hasher);
+            CoreNode core = buildCorenode(a, localStorage, transactions, rawPointers, localPointers, proxingMutable,
+                    rawSocial, crypto.hasher);
 
             QuotaAdmin userQuotas = buildSpaceQuotas(a, localStorage, core);
             CoreNode signupFilter = new SignUpFilter(core, userQuotas, nodeId);
@@ -454,9 +456,6 @@ public class Main extends Builder {
 
             SocialNetworkProxy httpSocial = new HttpSocialNetwork(p2pHttpProxy, p2pHttpProxy);
 
-            Supplier<Connection> socialDatabase = getDBConnector(a, "social-sql-file");
-
-            JdbcIpnsAndSocial rawSocial = new JdbcIpnsAndSocial(socialDatabase, sqlCommands);
             SocialNetwork local = UserRepository.build(p2pDht, rawSocial);
             SocialNetwork p2pSocial = new ProxyingSocialNetwork(nodeId, core, local, httpSocial);
 
