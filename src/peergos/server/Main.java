@@ -427,13 +427,13 @@ public class Main extends Builder {
             MutablePointers localPointers = UserRepository.build(localStorage, rawPointers);
             MutablePointersProxy proxingMutable = new HttpMutablePointers(p2pHttpProxy, pkiServerNodeId);
 
+            UsageStore usageStore = new JdbcUsageStore(getDBConnector(a, "space-usage-sql-file"), sqlCommands);
+
             CoreNode core = buildCorenode(a, localStorage, transactions, rawPointers, localPointers, proxingMutable, crypto.hasher);
 
             QuotaAdmin userQuotas = buildSpaceQuotas(a, localStorage, core);
             CoreNode signupFilter = new SignUpFilter(core, userQuotas, nodeId);
 
-            Supplier<Connection> usageDb = getDBConnector(a, "space-usage-sql-file");
-            UsageStore usageStore = new JdbcUsageStore(usageDb, sqlCommands);
             Hasher hasher = crypto.hasher;
             SpaceCheckingKeyFilter.update(usageStore, userQuotas, core, localPointers, localStorage, hasher);
             SpaceCheckingKeyFilter spaceChecker = new SpaceCheckingKeyFilter(core, localPointers, localStorage,
@@ -494,7 +494,6 @@ public class Main extends Builder {
 
             if (a.hasArg("mirror.node.id")) {
                 Multihash nodeToMirrorId = Cid.decode(a.getArg("mirror.node.id"));
-                NetworkAccess localApi = Builder.buildLocalJavaNetworkAccess(webPort).join();
                 new Thread(() -> {
                     while (true) {
                         try {

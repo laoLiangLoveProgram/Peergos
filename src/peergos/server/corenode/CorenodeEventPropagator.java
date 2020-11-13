@@ -32,13 +32,19 @@ public class CorenodeEventPropagator implements CoreNode {
         return target.updateChain(username, chain, proof)
                 .thenApply(res -> {
                     if (res.isEmpty()) {
-                        CorenodeEvent event = new CorenodeEvent(username, chain.get(chain.size() - 1).owner);
-                        for (Consumer<? super CorenodeEvent> listener : listeners) {
-                            listener.accept(event);
-                        }
+                        processEvent(chain);
                     }
                     return res;
                 });
+    }
+
+    private void processEvent(List<UserPublicKeyLink> chain) {
+        UserPublicKeyLink last = chain.get(chain.size() - 1);
+        CorenodeEvent event = new CorenodeEvent(last.claim.username, last.owner);
+        for (Consumer<? super CorenodeEvent> listener : listeners) {
+            listener.accept(event);
+        }
+
     }
 
     @Override
@@ -60,7 +66,10 @@ public class CorenodeEventPropagator implements CoreNode {
     public CompletableFuture<UserSnapshot> migrateUser(String username,
                                                        List<UserPublicKeyLink> newChain,
                                                        Multihash currentStorageId) {
-        return target.migrateUser(username, newChain, currentStorageId);
+        return target.migrateUser(username, newChain, currentStorageId).thenApply(res -> {
+            processEvent(newChain);
+            return res;
+        });
     }
 
     @Override
