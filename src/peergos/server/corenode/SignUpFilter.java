@@ -30,8 +30,7 @@ public class SignUpFilter implements CoreNode {
 
     @Override
     public CompletableFuture<Optional<RequiredDifficulty>> updateChain(String username, List<UserPublicKeyLink> chain, ProofOfWork proof) {
-        boolean forUs = chain.get(chain.size() - 1).claim.storageProviders.contains(ourNodeId);
-        if (! forUs)
+        if (! forUs(chain))
             return target.updateChain(username, chain, proof);
         return CompletableFuture.completedFuture(true)
                 .thenCompose(x -> {
@@ -39,6 +38,10 @@ public class SignUpFilter implements CoreNode {
                         return target.updateChain(username, chain, proof);
                     throw new IllegalStateException("This server is not currently accepting new sign ups. Please try again later");
                 });
+    }
+
+    private boolean forUs(List<UserPublicKeyLink> chain) {
+        return chain.get(chain.size() - 1).claim.storageProviders.contains(ourNodeId);
     }
 
     @Override
@@ -55,6 +58,11 @@ public class SignUpFilter implements CoreNode {
     public CompletableFuture<UserSnapshot> migrateUser(String username,
                                                        List<UserPublicKeyLink> newChain,
                                                        Multihash currentStorageId) {
+        if (forUs(newChain)) {
+            if (! judge.allowSignupOrUpdate(username))
+                throw new IllegalStateException("This server is not currently accepting new user migrations.");
+        }
+
         return target.migrateUser(username, newChain, currentStorageId);
     }
 
