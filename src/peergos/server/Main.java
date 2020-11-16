@@ -631,13 +631,11 @@ public class Main extends Builder {
 
             TransactionStore transactions = buildTransactionStore(a);
             DeletableContentAddressedStorage localStorage = buildLocalStorage(a, transactions);
-            JdbcIpnsAndSocial rawPointers = buildRawPointers(a);
             QuotaAdmin userQuotas = buildSpaceQuotas(a, localStorage, null);
-            JdbcIpnsAndSocial rawSocial = new JdbcIpnsAndSocial(getDBConnector(a, "social-sql-file"), getSqlCommands(a));
 
             UserContext user = UserContext.signIn(username, password, network, crypto).join();
 
-            Migrate.migrateToLocal(user, transactions, localStorage, rawPointers, rawSocial, userQuotas, crypto, network);
+            Migrate.migrateToLocal(user, localStorage, userQuotas, network);
             return true;
         } catch (Exception ex) {
             throw new RuntimeException(ex);
