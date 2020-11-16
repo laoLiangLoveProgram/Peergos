@@ -432,7 +432,7 @@ public class Main extends Builder {
             HttpSpaceUsage httpSpaceUsage = new HttpSpaceUsage(p2pHttpProxy, p2pHttpProxy);
 
             CoreNode core = buildCorenode(a, localStorage, transactions, rawPointers, localPointers, proxingMutable,
-                    rawSocial, crypto.hasher);
+                    rawSocial, usageStore, crypto.hasher);
 
             QuotaAdmin userQuotas = buildSpaceQuotas(a, localStorage, core);
             CoreNode signupFilter = new SignUpFilter(core, userQuotas, nodeId, userQuotas, httpSpaceUsage);
